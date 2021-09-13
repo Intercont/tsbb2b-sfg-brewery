@@ -38,7 +38,8 @@ class BeerControllerTest {
 
     @BeforeEach
     void setUp() {
-        validBeer = BeerDto.builder().id(UUID.randomUUID())
+        validBeer = BeerDto.builder()
+                .id(UUID.randomUUID())
                 .version(1)
                 .beerName("Beer1")
                 .beerStyle(BeerStyleEnum.PALE_ALE)
@@ -62,5 +63,17 @@ class BeerControllerTest {
                 .andExpect(jsonPath("$.id", is(validBeer.getId().toString())))
                 .andExpect(jsonPath("$.beerName", is("Beer1")));
 
+    }
+
+    @Test
+    void testGetBeerByIdByIgor() throws Exception {
+        given(beerService.findBeerById(any())).willReturn(validBeer);
+
+        mockMvc.perform(get("/api/v1/beer/{beerId}", validBeer.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.id", is(validBeer.getId().toString())))
+                .andExpect(jsonPath("$.upc", is(validBeer.getUpc())))
+                .andExpect(jsonPath("$.beerStyle", is(BeerStyleEnum.PALE_ALE.toString())));
     }
 }
